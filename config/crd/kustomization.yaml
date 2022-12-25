@@ -3,3 +3,4 @@ kind: Kustomization
 bases:
   - common
 resources:
+  - bases/organizations.services.k8s.aws_organizationalunits.yaml
