@@ -3,5 +3,16 @@ ignore:
       - Account
       - GovCloudAccount
       - Organization
-      - OrganizationalUnit
+      #- OrganizationalUnit
       - Policy
+resources:
+  OrganizationalUnit:
+    renames:
+      operations:
+        DescribeOrganizationalUnit:
+          input_fields:
+            OrganizationalUnitId: Id
+    fields:
+      ID:
+        is_read_only: true
+        is_primary_key: true

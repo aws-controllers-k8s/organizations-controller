@@ -32,6 +32,26 @@ rules:
   - patch
   - watch
 - apiGroups:
+  - organizations.services.k8s.aws
+  resources:
+  - organizationalunits
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - organizations.services.k8s.aws
+  resources:
+  - organizationalunits/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - services.k8s.aws
   resources:
   - adoptedresources

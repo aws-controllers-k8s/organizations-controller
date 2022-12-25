@@ -27,3 +27,35 @@ var (
 	_ = &aws.JSONValue{}
 	_ = ackv1alpha1.AWSAccountID("")
 )
+
+// Contains details about an organizational unit (OU). An OU is a container
+// of Amazon Web Services accounts within a root of an organization. Policies
+// that are attached to an OU apply to all accounts contained in that OU and
+// in any child OUs.
+type OrganizationalUnit_SDK struct {
+	ARN  *string `json:"arn,omitempty"`
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+// Contains information about either a root or an organizational unit (OU) that
+// can contain OUs or accounts in an organization.
+type Parent struct {
+	ID *string `json:"id,omitempty"`
+}
+
+// A custom key-value pair associated with a resource within your organization.
+//
+// You can attach tags to any of the following organization resources.
+//
+//    * Amazon Web Services account
+//
+//    * Organizational unit (OU)
+//
+//    * Organization root
+//
+//    * Policy
+type Tag struct {
+	Key   *string `json:"key,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
