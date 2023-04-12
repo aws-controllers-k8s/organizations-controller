@@ -34,6 +34,8 @@ import (
 	svctypes "github.com/aws-controllers-k8s/organizations-controller/apis/v1alpha1"
 	svcresource "github.com/aws-controllers-k8s/organizations-controller/pkg/resource"
 
+	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/account"
+	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organization"
 	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organizational_unit"
 
 	"github.com/aws-controllers-k8s/organizations-controller/pkg/version"

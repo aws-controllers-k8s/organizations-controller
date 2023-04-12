@@ -28,6 +28,90 @@ var (
 	_ = ackv1alpha1.AWSAccountID("")
 )
 
+// Contains information about an Amazon Web Services account that is a member
+// of an organization.
+type Account_SDK struct {
+	ARN             *string      `json:"arn,omitempty"`
+	Email           *string      `json:"email,omitempty"`
+	ID              *string      `json:"id,omitempty"`
+	JoinedMethod    *string      `json:"joinedMethod,omitempty"`
+	JoinedTimestamp *metav1.Time `json:"joinedTimestamp,omitempty"`
+	Name            *string      `json:"name,omitempty"`
+	Status          *string      `json:"status,omitempty"`
+}
+
+// Contains the status about a CreateAccount or CreateGovCloudAccount request
+// to create an Amazon Web Services account or an Amazon Web Services GovCloud
+// (US) account in an organization.
+type CreateAccountStatus struct {
+	AccountID          *string      `json:"accountID,omitempty"`
+	AccountName        *string      `json:"accountName,omitempty"`
+	CompletedTimestamp *metav1.Time `json:"completedTimestamp,omitempty"`
+	FailureReason      *string      `json:"failureReason,omitempty"`
+	GovCloudAccountID  *string      `json:"govCloudAccountID,omitempty"`
+	ID                 *string      `json:"id,omitempty"`
+	RequestedTimestamp *metav1.Time `json:"requestedTimestamp,omitempty"`
+	State              *string      `json:"state,omitempty"`
+}
+
+// Contains information about the delegated administrator.
+type DelegatedAdministrator struct {
+	ARN                   *string      `json:"arn,omitempty"`
+	DelegationEnabledDate *metav1.Time `json:"delegationEnabledDate,omitempty"`
+	Email                 *string      `json:"email,omitempty"`
+	ID                    *string      `json:"id,omitempty"`
+	JoinedMethod          *string      `json:"joinedMethod,omitempty"`
+	JoinedTimestamp       *metav1.Time `json:"joinedTimestamp,omitempty"`
+	Name                  *string      `json:"name,omitempty"`
+	Status                *string      `json:"status,omitempty"`
+}
+
+// Contains information about the Amazon Web Services service for which the
+// account is a delegated administrator.
+type DelegatedService struct {
+	DelegationEnabledDate *metav1.Time `json:"delegationEnabledDate,omitempty"`
+}
+
+// Contains rules to be applied to the affected accounts. The effective policy
+// is the aggregation of any policies the account inherits, plus any policy
+// directly attached to the account.
+type EffectivePolicy struct {
+	LastUpdatedTimestamp *metav1.Time `json:"lastUpdatedTimestamp,omitempty"`
+}
+
+// A structure that contains details of a service principal that represents
+// an Amazon Web Services service that is enabled to integrate with Organizations.
+type EnabledServicePrincipal struct {
+	DateEnabled *metav1.Time `json:"dateEnabled,omitempty"`
+}
+
+// Contains information that must be exchanged to securely establish a relationship
+// between two accounts (an originator and a recipient). For example, when a
+// management account (the originator) invites another account (the recipient)
+// to join its organization, the two accounts exchange information as a series
+// of handshake requests and responses.
+//
+// Note: Handshakes that are CANCELED, ACCEPTED, DECLINED, or EXPIRED show up
+// in lists for only 30 days after entering that state After that they are deleted.
+type Handshake struct {
+	ExpirationTimestamp *metav1.Time `json:"expirationTimestamp,omitempty"`
+	RequestedTimestamp  *metav1.Time `json:"requestedTimestamp,omitempty"`
+}
+
+// Contains details about an organization. An organization is a collection of
+// accounts that are centrally managed together using consolidated billing,
+// organized hierarchically with organizational units (OUs), and controlled
+// with policies .
+type Organization_SDK struct {
+	ARN                  *string              `json:"arn,omitempty"`
+	AvailablePolicyTypes []*PolicyTypeSummary `json:"availablePolicyTypes,omitempty"`
+	FeatureSet           *string              `json:"featureSet,omitempty"`
+	ID                   *string              `json:"id,omitempty"`
+	MasterAccountARN     *string              `json:"masterAccountARN,omitempty"`
+	MasterAccountEmail   *string              `json:"masterAccountEmail,omitempty"`
+	MasterAccountID      *string              `json:"masterAccountID,omitempty"`
+}
+
 // Contains details about an organizational unit (OU). An OU is a container
 // of Amazon Web Services accounts within a root of an organization. Policies
 // that are attached to an OU apply to all accounts contained in that OU and
@@ -42,6 +126,26 @@ type OrganizationalUnit_SDK struct {
 // can contain OUs or accounts in an organization.
 type Parent struct {
 	ID *string `json:"id,omitempty"`
+}
+
+// Contains information about a policy, but does not include the content. To
+// see the content of a policy, see DescribePolicy.
+type PolicySummary struct {
+	Type *string `json:"type_,omitempty"`
+}
+
+// Contains information about a policy type and its status in the associated
+// root.
+type PolicyTypeSummary struct {
+	Status *string `json:"status,omitempty"`
+	Type   *string `json:"type_,omitempty"`
+}
+
+// Contains details about a root. A root is a top-level parent node in the hierarchy
+// of an organization that can contain organizational units (OUs) and accounts.
+// The root contains every Amazon Web Services account in the organization.
+type Root struct {
+	PolicyTypes []*PolicyTypeSummary `json:"policyTypes,omitempty"`
 }
 
 // A custom key-value pair associated with a resource within your organization.

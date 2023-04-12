@@ -28,12 +28,12 @@ const (
 	AccountJoinedMethod_CREATED AccountJoinedMethod = "CREATED"
 )
 
-type AccountStatus string
+type AccountStatus_SDK string
 
 const (
-	AccountStatus_ACTIVE          AccountStatus = "ACTIVE"
-	AccountStatus_SUSPENDED       AccountStatus = "SUSPENDED"
-	AccountStatus_PENDING_CLOSURE AccountStatus = "PENDING_CLOSURE"
+	AccountStatus_SDK_ACTIVE          AccountStatus_SDK = "ACTIVE"
+	AccountStatus_SDK_SUSPENDED       AccountStatus_SDK = "SUSPENDED"
+	AccountStatus_SDK_PENDING_CLOSURE AccountStatus_SDK = "PENDING_CLOSURE"
 )
 
 type ActionType string
