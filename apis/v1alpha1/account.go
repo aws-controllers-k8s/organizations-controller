@@ -35,24 +35,24 @@ type AccountSpec struct {
 	//
 	// The rules for a valid email address:
 	//
-	//    * The address must be a minimum of 6 and a maximum of 64 characters long.
+	//   - The address must be a minimum of 6 and a maximum of 64 characters long.
 	//
-	//    * All characters must be 7-bit ASCII characters.
+	//   - All characters must be 7-bit ASCII characters.
 	//
-	//    * There must be one and only one @ symbol, which separates the local name
-	//    from the domain name.
+	//   - There must be one and only one @ symbol, which separates the local name
+	//     from the domain name.
 	//
-	//    * The local name can't contain any of the following characters: whitespace,
-	//    " ' ( ) < > [ ] : ; , \ | % &
+	//   - The local name can't contain any of the following characters: whitespace,
+	//     " ' ( ) < > [ ] : ; , \ | % &
 	//
-	//    * The local name can't begin with a dot (.)
+	//   - The local name can't begin with a dot (.)
 	//
-	//    * The domain name can consist of only the characters [a-z],[A-Z],[0-9],
-	//    hyphen (-), or dot (.)
+	//   - The domain name can consist of only the characters [a-z],[A-Z],[0-9],
+	//     hyphen (-), or dot (.)
 	//
-	//    * The domain name can't begin or end with a hyphen (-) or dot (.)
+	//   - The domain name can't begin or end with a hyphen (-) or dot (.)
 	//
-	//    * The domain name must contain at least one dot
+	//   - The domain name must contain at least one dot
 	//
 	// You can't access the root user of the account or remove an account that was
 	// created with an invalid email address.
@@ -80,13 +80,13 @@ type AccountSpec struct {
 	// For more information about how to use this role to access the member account,
 	// see the following links:
 	//
-	//    * Accessing and Administering the Member Accounts in Your Organization
-	//    (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_create-cross-account-role)
-	//    in the Organizations User Guide
+	//   - Accessing and Administering the Member Accounts in Your Organization
+	//     (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_create-cross-account-role)
+	//     in the Organizations User Guide
 	//
-	//    * Steps 2 and 3 in Tutorial: Delegate Access Across Amazon Web Services
-	//    accounts Using IAM Roles (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html)
-	//    in the IAM User Guide
+	//   - Steps 2 and 3 in Tutorial: Delegate Access Across Amazon Web Services
+	//     accounts Using IAM Roles (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html)
+	//     in the IAM User Guide
 	//
 	// The regex pattern (http://wikipedia.org/wiki/regex) that is used to validate
 	// this parameter. The pattern can include uppercase letters, lowercase letters,

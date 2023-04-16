@@ -45,15 +45,15 @@ spec:
                   member account. This email address must not already be associated
                   with another Amazon Web Services account. You must use a valid email
                   address to complete account creation. \n The rules for a valid email
-                  address: \n * The address must be a minimum of 6 and a maximum of
-                  64 characters long. \n * All characters must be 7-bit ASCII characters.
-                  \n * There must be one and only one @ symbol, which separates the
-                  local name from the domain name. \n * The local name can't contain
+                  address: \n - The address must be a minimum of 6 and a maximum of
+                  64 characters long. \n - All characters must be 7-bit ASCII characters.
+                  \n - There must be one and only one @ symbol, which separates the
+                  local name from the domain name. \n - The local name can't contain
                   any of the following characters: whitespace, \" ' ( ) < > [ ] :
-                  ; , \\ | % & \n * The local name can't begin with a dot (.) \n *
+                  ; , \\ | % & \n - The local name can't begin with a dot (.) \n -
                   The domain name can consist of only the characters [a-z],[A-Z],[0-9],
-                  hyphen (-), or dot (.) \n * The domain name can't begin or end with
-                  a hyphen (-) or dot (.) \n * The domain name must contain at least
+                  hyphen (-), or dot (.) \n - The domain name can't begin or end with
+                  a hyphen (-) or dot (.) \n - The domain name must contain at least
                   one dot \n You can't access the root user of the account or remove
                   an account that was created with an invalid email address."
                 type: string
@@ -76,9 +76,9 @@ spec:
                   role has administrator permissions in the new member account. \n
                   If you don't specify this parameter, the role name defaults to OrganizationAccountAccessRole.
                   \n For more information about how to use this role to access the
-                  member account, see the following links: \n * Accessing and Administering
+                  member account, see the following links: \n - Accessing and Administering
                   the Member Accounts in Your Organization (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_create-cross-account-role)
-                  in the Organizations User Guide \n * Steps 2 and 3 in Tutorial:
+                  in the Organizations User Guide \n - Steps 2 and 3 in Tutorial:
                   Delegate Access Across Amazon Web Services accounts Using IAM Roles
                   (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html)
                   in the IAM User Guide \n The regex pattern (http://wikipedia.org/wiki/regex)
@@ -98,8 +98,8 @@ spec:
                 items:
                   description: "A custom key-value pair associated with a resource
                     within your organization. \n You can attach tags to any of the
-                    following organization resources. \n * Amazon Web Services account
-                    \n * Organizational unit (OU) \n * Organization root \n * Policy"
+                    following organization resources. \n - Amazon Web Services account
+                    \n - Organizational unit (OU) \n - Organization root \n - Policy"
                   properties:
                     key:
                       type: string
