@@ -2,8 +2,6 @@ ignore:
   resource_names:
       - Account
       - GovCloudAccount
-      - Organization
-      #- OrganizationalUnit
       - Policy
 resources:
   OrganizationalUnit:
@@ -19,3 +17,9 @@ resources:
       ID:
         is_read_only: true
         is_primary_key: true
+  Organization:
+    fields:
+      Id:
+        is_primary_key: true
+    tags:
+      ignore: true
