@@ -48,13 +48,13 @@ type Parent struct {
 //
 // You can attach tags to any of the following organization resources.
 //
-//    * Amazon Web Services account
+//   - Amazon Web Services account
 //
-//    * Organizational unit (OU)
+//   - Organizational unit (OU)
 //
-//    * Organization root
+//   - Organization root
 //
-//    * Policy
+//   - Policy
 type Tag struct {
 	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`

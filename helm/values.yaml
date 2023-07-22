@@ -4,7 +4,7 @@
 
 image:
   repository: public.ecr.aws/aws-controllers-k8s/organizations-controller
-  tag: v0.0.0-non-release-version
+  tag: 0.0.0-non-release-version
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -31,7 +31,7 @@ deployment:
 
 # If "installScope: cluster" then these labels will be applied to ClusterRole
 role:
- labels: {}
+  labels: {}
   
 metrics:
   service:
@@ -72,11 +72,27 @@ log:
 # cluster wide.
 installScope: cluster
 
+# Set the value of the "namespace" to be watched by the controller
+# This value is only used when the `installScope` is set to "namespace". If left empty, the default value is the release namespace for the chart.
+watchNamespace: ""
+
 resourceTags:
   # Configures the ACK service controller to always set key/value pairs tags on
   # resources that it manages.
   - services.k8s.aws/controller-version=%CONTROLLER_SERVICE%-%CONTROLLER_VERSION%
   - services.k8s.aws/namespace=%K8S_NAMESPACE%
+
+# Set to "retain" to keep all AWS resources intact even after the K8s resources
+# have been deleted. By default, the ACK controller will delete the AWS resource
+# before the K8s resource is removed.
+deletionPolicy: delete
+
+# controller reconciliation configurations
+reconcile:
+  # The default duration, in seconds, to wait before resyncing desired state of custom resources.
+  defaultResyncPeriod: 0
+  # An object representing the reconcile resync configuration for each specific resource.
+  resourceResyncPeriods: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
