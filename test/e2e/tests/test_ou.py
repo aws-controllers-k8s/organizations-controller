@@ -81,7 +81,7 @@ class TestOrganizationalUnit:
         assert cr is not None
         assert 'spec' in cr
         assert 'name' in cr["spec"]
-        assert 'arn' in cr['status']['ackResourceMetadata']
+        assert 'id' in cr["status"]
 
         ou_name = cr['spec']['name']
         ou_validator = OrganizationalUnitValidator(organizations_client)
