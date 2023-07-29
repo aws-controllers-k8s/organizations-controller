@@ -39,7 +39,7 @@ def simple_ou(organizations_client):
 
     # Load resource
     resource_data = load_organizations_resource(
-        "ou",
+        "organizationalunit",
         additional_replacements=replacements,
     )
     logging.debug(resource_data)
