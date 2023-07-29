@@ -31,15 +31,15 @@ DELETE_WAIT_AFTER_SECONDS = 5
 
 
 @pytest.fixture(scope="module")
-def simple_secret(secretsmanager_client):
+def simple_ou(organizations_client):
     resource_name = random_suffix_name("simple-ou", 24)
 
     replacements = REPLACEMENT_VALUES.copy()
     replacements["OU_NAME"] = resource_name
 
     # Load resource
-    resource_data = load_secretsmanager_resource(
-        "secret",
+    resource_data = load_organizations_resource(
+        "ou",
         additional_replacements=replacements,
     )
     logging.debug(resource_data)
@@ -49,11 +49,14 @@ def simple_secret(secretsmanager_client):
         resource_name, namespace="default",
     )
 
-    # Create secret
+    # Create OU
     k8s.create_custom_resource(ref, resource_data)
     cr = k8s.wait_resource_consumed_by_controller(ref)
 
     yield cr, ref
+
+    # Get OU ID from resource
+    ou_id = cr["status"]["id"]
 
     # Delete k8s resource
     _, deleted = k8s.delete_custom_resource(
@@ -62,9 +65,8 @@ def simple_secret(secretsmanager_client):
     )
     assert deleted
 
-    response = secretsmanager_client.describe_secret(SecretId=resource_name)
-    delete_date = response['DeletedDate']
-    assert delete_date is not None
+    with pytest.raises(organizations_client.exceptions.OrganizationalUnitNotFoundException):
+        organizations_client.describe_organizational_unit(OrganizationalUnitId=ou_id)
 
 
 @service_marker
