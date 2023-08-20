@@ -29,13 +29,35 @@ RESOURCE_PLURAL = "organizationalunits"
 
 DELETE_WAIT_AFTER_SECONDS = 5
 
+def organization_exists(organizations_client):
+    try:
+        resp = organizations_client.describe_organization()
+        return resp["Organization"]["Id"]
+    except organizations_client.meta.client.exceptions.AWSOrganizationsNotInUseException:
+        return False
+    except Exception as e:
+        assert False, f"describe_organizations failed with exception {str(e)}"
+
+
 
 @pytest.fixture(scope="module")
 def simple_ou(organizations_client):
     resource_name = random_suffix_name("simple-ou", 24)
 
+    org_exists = organization_exists(organizations_client)
+    if False == org_exists:
+        print("org doesn't exist, creating...")
+        try:
+            create_resp = organizations_client.create_organization(FeatureSet="ALL")
+        except:
+            assert False, f"create_organization failed with exception {str(e)}"
+
+    list_root_resp = organizations_client.list_roots()
+    root_id = list_root_resp["Roots"][0]["Id"]
+    
     replacements = REPLACEMENT_VALUES.copy()
     replacements["OU_NAME"] = resource_name
+    replacements["ROOT_ID"] = root_id
 
     # Load resource
     resource_data = load_organizations_resource(
@@ -67,6 +89,14 @@ def simple_ou(organizations_client):
 
     with pytest.raises(organizations_client.exceptions.OrganizationalUnitNotFoundException):
         organizations_client.describe_organizational_unit(OrganizationalUnitId=ou_id)
+
+    # Delete Organization if we created one
+    if org_exists:
+        try:
+            organizations_client.delete_organization()
+        except Exception as e:
+            assert False, f"deleting organisation {root_id} failed with exception {str(e)}"
+
 
 
 @service_marker
