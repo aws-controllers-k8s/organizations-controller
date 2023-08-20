@@ -91,7 +91,7 @@ def simple_ou(organizations_client):
         organizations_client.describe_organizational_unit(OrganizationalUnitId=ou_id)
 
     # Delete Organization if we created one
-    if True == org_exists:
+    if False == org_exists:
         try:
             organizations_client.delete_organization()
         except Exception as e:
