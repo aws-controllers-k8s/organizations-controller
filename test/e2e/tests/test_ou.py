@@ -31,8 +31,8 @@ DELETE_WAIT_AFTER_SECONDS = 5
 
 def organization_exists(organizations_client):
     try:
-        resp = organizations_client.describe_organization()
-        return resp["Organization"]["Id"]
+        _ = organizations_client.describe_organization()
+        return True
     except organizations_client.meta.client.exceptions.AWSOrganizationsNotInUseException:
         return False
     except Exception as e:
@@ -48,13 +48,13 @@ def simple_ou(organizations_client):
     if False == org_exists:
         print("org doesn't exist, creating...")
         try:
-            create_resp = organizations_client.create_organization(FeatureSet="ALL")
+            _ = organizations_client.create_organization(FeatureSet="ALL")
         except:
             assert False, f"create_organization failed with exception {str(e)}"
 
     list_root_resp = organizations_client.list_roots()
     root_id = list_root_resp["Roots"][0]["Id"]
-    
+
     replacements = REPLACEMENT_VALUES.copy()
     replacements["OU_NAME"] = resource_name
     replacements["ROOT_ID"] = root_id
@@ -91,7 +91,7 @@ def simple_ou(organizations_client):
         organizations_client.describe_organizational_unit(OrganizationalUnitId=ou_id)
 
     # Delete Organization if we created one
-    if org_exists:
+    if True == org_exists:
         try:
             organizations_client.delete_organization()
         except Exception as e:
