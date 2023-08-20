@@ -33,7 +33,7 @@ def organization_exists(organizations_client):
     try:
         _ = organizations_client.describe_organization()
         return True
-    except organizations_client.meta.client.exceptions.AWSOrganizationsNotInUseException:
+    except organizations_client.exceptions.AWSOrganizationsNotInUseException:
         return False
     except Exception as e:
         assert False, f"describe_organizations failed with exception {str(e)}"
