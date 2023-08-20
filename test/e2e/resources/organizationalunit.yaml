@@ -4,7 +4,7 @@ metadata:
   name: $OU_NAME
 spec:
   name: $OU_NAME
-  parentID: r-eoeoeoe
+  parentID: r-1kpe
   tags:
   - key: key1
     value: value1

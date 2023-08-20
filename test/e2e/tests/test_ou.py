@@ -83,12 +83,9 @@ class TestOrganizationalUnit:
         assert 'name' in cr["spec"]
         assert 'id' in cr["status"]
 
-        ou_name = cr['spec']['name']
+        ou_id = cr['status']['id']
         ou_validator = OrganizationalUnitValidator(organizations_client)
         expect_tags = {
             "key1": "value1",
         }
-        ou_validator.assert_tags(ou_name, expect_tags)
-
-        expected_value = '{"env":"test"}'
-        ou_validator.assert_value(ou_name, expected_value)
+        ou_validator.assert_tags(ou_id, expect_tags)

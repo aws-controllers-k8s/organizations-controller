@@ -313,6 +313,10 @@ func (rm *resourceManager) newDeleteRequestPayload(
 ) (*svcsdk.DeleteOrganizationalUnitInput, error) {
 	res := &svcsdk.DeleteOrganizationalUnitInput{}
 
+	if r.ko.Status.ID != nil {
+		res.SetOrganizationalUnitId(*r.ko.Status.ID)
+	}
+
 	return res, nil
 }
 
