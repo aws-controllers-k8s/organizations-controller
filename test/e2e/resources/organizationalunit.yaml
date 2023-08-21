@@ -1,0 +1,10 @@
+apiVersion: organizations.services.k8s.aws/v1alpha1
+kind: OrganizationalUnit
+metadata:
+  name: $OU_NAME
+spec:
+  name: $OU_NAME
+  parentID: $ROOT_ID
+  tags:
+  - key: key1
+    value: value1

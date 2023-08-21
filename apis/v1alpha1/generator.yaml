@@ -12,6 +12,9 @@ resources:
         DescribeOrganizationalUnit:
           input_fields:
             OrganizationalUnitId: Id
+        DeleteOrganizationalUnit:
+          input_fields:
+            OrganizationalUnitId: Id
     fields:
       ID:
         is_read_only: true

@@ -196,12 +196,31 @@
       "type": "string",
       "enum": ["cluster", "namespace"]
     },
+    "watchNamespace": {
+      "type": "string"
+    },    
     "resourceTags": {
       "type": "array",
       "items": {
         "type": "string",
         "pattern": "(^$|^.*=.*$)"
       }
+    },
+    "deletionPolicy": {
+      "type": "string",
+      "enum": ["delete", "retain"]
+    },
+    "reconcile": {
+      "description": "Reconcile resync settings. Parameters to tune the controller's drift remediation period.",
+      "properties": {
+        "defaultResyncPeriod": {
+          "type": "number"
+        },
+        "resourceResyncPeriods": {
+          "type": "object"
+        }
+      },
+      "type": "object"
     },
     "serviceAccount": {
       "description": "ServiceAccount settings",
