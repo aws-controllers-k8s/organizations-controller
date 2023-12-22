@@ -34,6 +34,26 @@ rules:
 - apiGroups:
   - organizations.services.k8s.aws
   resources:
+  - accounts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - organizations.services.k8s.aws
+  resources:
+  - accounts/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - organizations.services.k8s.aws
+  resources:
   - organizationalunits
   verbs:
   - create

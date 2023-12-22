@@ -9,6 +9,8 @@ rules:
 - apiGroups:
   - organizations.services.k8s.aws
   resources:
+  - accounts
+
   - organizationalunits
 
   verbs:
@@ -22,6 +24,7 @@ rules:
 - apiGroups:
   - organizations.services.k8s.aws
   resources:
+  - accounts
   - organizationalunits
   verbs:
   - get
