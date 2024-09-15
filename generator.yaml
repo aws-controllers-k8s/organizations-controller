@@ -21,5 +21,6 @@ resources:
     fields:
       Id:
         is_primary_key: true
+        is_read_only: true
     tags:
       ignore: true
