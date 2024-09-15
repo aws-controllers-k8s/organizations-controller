@@ -1,23 +1,30 @@
-apiVersion: rbac.authorization.k8s.io/v1
+{{ $labels := .Values.role.labels }}
+{{ $rbacRules := include "ack-organizations-controller.rbac-rules" . }}
 {{ if eq .Values.installScope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: ack-organizations-controller
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-{{ else }}
+{{$rbacRules }}
+{{ else if eq .Values.installScope "namespace" }}
+{{ $wn := include "ack-organizations-controller.watch-namespace" . }}
+{{ $namespaces := split "," $wn }}
+{{ range $namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
   name: ack-organizations-controller
+  namespace: {{ . }}
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-  namespace: {{ .Release.Namespace }}
+{{ $rbacRules }}
 {{ end }}
 rules:
 - apiGroups:

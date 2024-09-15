@@ -24,16 +24,20 @@ import (
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	ackrtutil "github.com/aws-controllers-k8s/runtime/pkg/util"
 	ackrtwebhook "github.com/aws-controllers-k8s/runtime/pkg/webhook"
-	svcsdk "github.com/aws/aws-sdk-go/service/organizations"
 	flag "github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrlrt "sigs.k8s.io/controller-runtime"
+	ctrlrtcache "sigs.k8s.io/controller-runtime/pkg/cache"
+	ctrlrthealthz "sigs.k8s.io/controller-runtime/pkg/healthz"
 	ctrlrtmetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlrtwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	svctypes "github.com/aws-controllers-k8s/organizations-controller/apis/v1alpha1"
 	svcresource "github.com/aws-controllers-k8s/organizations-controller/pkg/resource"
+	svcsdk "github.com/aws/aws-sdk-go/service/organizations"
 
 	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organization"
 	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organizational_unit"
@@ -85,14 +89,38 @@ func main() {
 		os.Exit(1)
 	}
 
+	watchNamespaces := make(map[string]ctrlrtcache.Config, 0)
+	namespaces, err := ackCfg.GetWatchNamespaces()
+	if err != nil {
+		setupLog.Error(
+			err, "Unable to parse watch namespaces.",
+			"aws.service", ackCfg.WatchNamespace,
+		)
+		os.Exit(1)
+	}
+
+	for _, namespace := range namespaces {
+		watchNamespaces[namespace] = ctrlrtcache.Config{}
+	}
 	mgr, err := ctrlrt.NewManager(ctrlrt.GetConfigOrDie(), ctrlrt.Options{
-		Scheme:             scheme,
-		Port:               port,
-		Host:               host,
-		MetricsBindAddress: ackCfg.MetricsAddr,
-		LeaderElection:     ackCfg.EnableLeaderElection,
-		LeaderElectionID:   awsServiceAPIGroup,
-		Namespace:          ackCfg.WatchNamespace,
+		Scheme: scheme,
+		Cache: ctrlrtcache.Options{
+			Scheme:            scheme,
+			DefaultNamespaces: watchNamespaces,
+		},
+		WebhookServer: &ctrlrtwebhook.DefaultServer{
+			Options: ctrlrtwebhook.Options{
+				Port: port,
+				Host: host,
+			},
+		},
+		Metrics:                 metricsserver.Options{BindAddress: ackCfg.MetricsAddr},
+		LeaderElection:          ackCfg.EnableLeaderElection,
+		LeaderElectionID:        "ack-" + awsServiceAPIGroup,
+		LeaderElectionNamespace: ackCfg.LeaderElectionNamespace,
+		HealthProbeBindAddress:  ackCfg.HealthzAddr,
+		LivenessEndpointName:    "/healthz",
+		ReadinessEndpointName:   "/readyz",
 	})
 	if err != nil {
 		setupLog.Error(
@@ -131,7 +159,6 @@ func main() {
 					err, "unable to register webhook "+webhook.UID(),
 					"aws.service", awsServiceAlias,
 				)
-
 			}
 		}
 	}
@@ -139,6 +166,21 @@ func main() {
 	if err = sc.BindControllerManager(mgr, ackCfg); err != nil {
 		setupLog.Error(
 			err, "unable bind to controller manager to service controller",
+			"aws.service", awsServiceAlias,
+		)
+		os.Exit(1)
+	}
+
+	if err = mgr.AddHealthzCheck("health", ctrlrthealthz.Ping); err != nil {
+		setupLog.Error(
+			err, "unable to set up health check",
+			"aws.service", awsServiceAlias,
+		)
+		os.Exit(1)
+	}
+	if err = mgr.AddReadyzCheck("check", ctrlrthealthz.Ping); err != nil {
+		setupLog.Error(
+			err, "unable to set up ready check",
 			"aws.service", awsServiceAlias,
 		)
 		os.Exit(1)
