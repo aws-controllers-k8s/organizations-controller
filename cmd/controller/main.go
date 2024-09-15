@@ -39,6 +39,7 @@ import (
 	svcresource "github.com/aws-controllers-k8s/organizations-controller/pkg/resource"
 	svcsdk "github.com/aws/aws-sdk-go/service/organizations"
 
+	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organization"
 	_ "github.com/aws-controllers-k8s/organizations-controller/pkg/resource/organizational_unit"
 
 	"github.com/aws-controllers-k8s/organizations-controller/pkg/version"
