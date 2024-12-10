@@ -1,0 +1,6 @@
+apiVersion: organizations.services.k8s.aws/v1alpha1
+kind: Organization
+metadata:
+  name: $ORG_NAME
+spec:
+  featureSet: ALL
