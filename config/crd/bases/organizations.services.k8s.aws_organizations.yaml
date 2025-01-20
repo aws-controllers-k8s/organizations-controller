@@ -1,0 +1,164 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: organizations.organizations.services.k8s.aws
+spec:
+  group: organizations.services.k8s.aws
+  names:
+    kind: Organization
+    listKind: OrganizationList
+    plural: organizations
+    singular: organization
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Organization is the Schema for the Organizations API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: "OrganizationSpec defines the desired state of Organization.
+              \n Contains details about an organization. An organization is a collection
+              of accounts that are centrally managed together using consolidated billing,
+              organized hierarchically with organizational units (OUs), and controlled
+              with policies ."
+            properties:
+              featureSet:
+                description: "Specifies the feature set supported by the new organization.
+                  Each feature set supports different levels of functionality. \n
+                  * CONSOLIDATED_BILLING: All member accounts have their bills consolidated
+                  to and paid by the management account. For more information, see
+                  Consolidated billing (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set-cb-only)
+                  in the Organizations User Guide. The consolidated billing feature
+                  subset isn't available for organizations in the Amazon Web Services
+                  GovCloud (US) Region. \n * ALL: In addition to all the features
+                  supported by the consolidated billing feature set, the management
+                  account can also apply any policy type to any member account in
+                  the organization. For more information, see All features (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set-all)
+                  in the Organizations User Guide."
+                type: string
+            type: object
+          status:
+            description: OrganizationStatus defines the observed state of Organization
+            properties:
+              ackResourceMetadata:
+                description: All CRs managed by ACK have a common `Status.ACKResourceMetadata`
+                  member that is used to contain resource sync state, account ownership,
+                  constructed ARN for the resource
+                properties:
+                  arn:
+                    description: 'ARN is the Amazon Resource Name for the resource.
+                      This is a globally-unique identifier and is set only by the
+                      ACK service controller once the controller has orchestrated
+                      the creation of the resource OR when it has verified that an
+                      "adopted" resource (a resource where the ARN annotation was
+                      set by the Kubernetes user on the CR) exists and matches the
+                      supplied CR''s Spec field values. TODO(vijat@): Find a better
+                      strategy for resources that do not have ARN in CreateOutputResponse
+                      https://github.com/aws/aws-controllers-k8s/issues/270'
+                    type: string
+                  ownerAccountID:
+                    description: OwnerAccountID is the AWS Account ID of the account
+                      that owns the backend AWS service API resource.
+                    type: string
+                  region:
+                    description: Region is the AWS region in which the resource exists
+                      or will exist.
+                    type: string
+                required:
+                - ownerAccountID
+                - region
+                type: object
+              availablePolicyTypes:
+                description: "Do not use. This field is deprecated and doesn't provide
+                  complete information about the policies in your organization. \n
+                  To determine the policies that are enabled and available for use
+                  in your organization, use the ListRoots operation instead."
+                items:
+                  description: Contains information about a policy type and its status
+                    in the associated root.
+                  properties:
+                    status:
+                      type: string
+                    type_:
+                      type: string
+                  type: object
+                type: array
+              conditions:
+                description: All CRS managed by ACK have a common `Status.Conditions`
+                  member that contains a collection of `ackv1alpha1.Condition` objects
+                  that describe the various terminal states of the CR and its backend
+                  AWS service API resource
+                items:
+                  description: Condition is the common struct used by all CRDs managed
+                    by ACK service controllers to indicate terminal states  of the
+                    CR and its backend AWS service API resource
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type is the type of the Condition
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              id:
+                description: "The unique identifier (ID) of an organization. \n The
+                  regex pattern (http://wikipedia.org/wiki/regex) for an organization
+                  ID string requires \"o-\" followed by from 10 to 32 lowercase letters
+                  or digits."
+                type: string
+              masterAccountARN:
+                description: "The Amazon Resource Name (ARN) of the account that is
+                  designated as the management account for the organization. \n For
+                  more information about ARNs in Organizations, see ARN Formats Supported
+                  by Organizations (https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsorganizations.html#awsorganizations-resources-for-iam-policies)
+                  in the Amazon Web Services Service Authorization Reference."
+                type: string
+              masterAccountEmail:
+                description: The email address that is associated with the Amazon
+                  Web Services account that is designated as the management account
+                  for the organization.
+                type: string
+              masterAccountID:
+                description: "The unique identifier (ID) of the management account
+                  of an organization. \n The regex pattern (http://wikipedia.org/wiki/regex)
+                  for an account ID string requires exactly 12 digits."
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
