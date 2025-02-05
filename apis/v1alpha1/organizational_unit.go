@@ -53,7 +53,7 @@ type OrganizationalUnitSpec struct {
 	// about tagging, see Tagging Organizations resources (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tagging.html)
 	// in the Organizations User Guide.
 	//
-	// If any one of the tags is invalid or if you exceed the allowed number of
+	// If any one of the tags is not valid or if you exceed the allowed number of
 	// tags for an OU, then the entire request fails and the OU is not created.
 	Tags []*Tag `json:"tags,omitempty"`
 }
@@ -71,7 +71,8 @@ type OrganizationalUnitStatus struct {
 	// resource
 	// +kubebuilder:validation:Optional
 	Conditions []*ackv1alpha1.Condition `json:"conditions"`
-	// The unique identifier (ID) associated with this OU.
+	// The unique identifier (ID) associated with this OU. The ID is unique to the
+	// organization only.
 	//
 	// The regex pattern (http://wikipedia.org/wiki/regex) for an organizational
 	// unit ID string requires "ou-" followed by from 4 to 32 lowercase letters
