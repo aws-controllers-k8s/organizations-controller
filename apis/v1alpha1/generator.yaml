@@ -1,11 +1,37 @@
 ignore:
   resource_names:
-      - Account
+      #- Account
       - GovCloudAccount
       - Organization
       #- OrganizationalUnit
       - Policy
+operations:
+  CloseAccount:
+    operation_type: Delete
+    resource_name: Account
+  DescribeCreateAccountStatus:
+    operation_type: ReadOne
+    resource_name: Account
 resources:
+  Account:
+    fields:
+      AccountID:
+        is_primary_key: true
+    renames:
+      operations:
+        CreateAccount:
+          input_fields:
+            AccountName: Name
+          output_fields:
+            Id: CreateAccountRequestId
+        DescribeAccount:
+          input_fields:
+            AccountName: Name
+    synced:
+      when:
+        - path: Status.State
+          in:
+            - SUCCEEDED
   OrganizationalUnit:
     renames:
       operations:
