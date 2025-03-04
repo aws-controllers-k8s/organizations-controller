@@ -27,6 +27,9 @@ from e2e.tests.ou_validator import OrganizationalUnitValidator
 RESOURCE_KIND = "Account"
 RESOURCE_PLURAL = "accounts"
 
+# Accounts take a bit to go into a SUCCEEDED state
+CREATE_WAIT_SECONDS = 120
+
 # Accounts can take a bit to become Suspended/Closed and as such be removed.
 DELETE_WAIT_AFTER_SECONDS = 60
 
@@ -74,11 +77,15 @@ def basic_account(organizations_client):
 
     # Create Account
     k8s.create_custom_resource(ref, resource_data)
+
+    # Wait for the account to be in a SUCCEEDED state before we get the resource out of k8s
+    time.sleep(CREATE_WAIT_SECONDS)
+
     cr = k8s.wait_resource_consumed_by_controller(ref)
 
     yield cr, ref
 
-    # Get OU ID from resource
+    # Get Account ID from resource
     account_id = cr["status"]["accountId"]
 
     # Delete k8s resource
