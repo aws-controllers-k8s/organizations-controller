@@ -86,7 +86,7 @@ def basic_account(organizations_client):
     yield cr, ref
 
     # Get Account ID from resource
-    account_id = cr["status"]["accountId"]
+    account_id = cr["status"]["accountID"]
 
     # Delete k8s resource
     _, deleted = k8s.delete_custom_resource(
@@ -110,7 +110,7 @@ def basic_account(organizations_client):
 @service_marker
 @pytest.mark.canary
 class TestAccount:
-    def test_create_delete(self, organizations_client, basic_account):
+    def test_create_close(self, organizations_client, basic_account):
         (res, ref) = basic_account
 
         time.sleep(5)
@@ -121,7 +121,7 @@ class TestAccount:
         assert 'name' in cr["spec"]
         assert 'accountId' in cr["status"]
 
-        account_id = cr['status']['accountId']
+        account_id = cr['status']['accountID']
         account_validator = AccountValidator(organizations_client)
         expect_tags = {
             "key1": "value1",
