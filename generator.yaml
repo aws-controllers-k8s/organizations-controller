@@ -27,6 +27,8 @@ resources:
         DescribeAccount:
           input_fields:
             AccountName: Name
+    update_operation:
+      custom_method_name: customUpdateAccount
     synced:
       when:
         - path: Status.State
