@@ -95,8 +95,8 @@ def basic_account(organizations_client):
     )
     assert deleted
 
-    with pytest.raises(organizations_client.exceptions.AccountNotFoundException):
-        organizations_client.describe_account(AccountId=account_id)
+    with pytest.raises(organizations_client.exceptions.AccountAlreadyClosedException):
+        organizations_client.close_account(AccountId=account_id)
 
     # Delete Organization if we created one
     if False == org_exists:
