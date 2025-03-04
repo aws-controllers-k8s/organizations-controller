@@ -119,7 +119,7 @@ class TestAccount:
         assert cr is not None
         assert 'spec' in cr
         assert 'name' in cr["spec"]
-        assert 'accountId' in cr["status"]
+        assert 'accountID' in cr["status"]
 
         account_id = cr['status']['accountID']
         account_validator = AccountValidator(organizations_client)
