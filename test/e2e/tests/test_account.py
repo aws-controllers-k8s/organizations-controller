@@ -22,7 +22,7 @@ from acktest.k8s import resource as k8s
 from acktest.resources import random_suffix_name
 from e2e import service_marker, CRD_GROUP, CRD_VERSION, load_organizations_resource
 from e2e.replacement_values import REPLACEMENT_VALUES
-from e2e.tests.ou_validator import OrganizationalUnitValidator
+from e2e.tests.account_validator import AccountValidator
 
 RESOURCE_KIND = "Account"
 RESOURCE_PLURAL = "accounts"
@@ -96,7 +96,7 @@ def basic_account(organizations_client):
     assert deleted
 
     with pytest.raises(organizations_client.exceptions.AccountNotFoundException):
-        organizations_client.describe_account(AccountID=account_id)
+        organizations_client.describe_account(AccountId=account_id)
 
     # Delete Organization if we created one
     if False == org_exists:
