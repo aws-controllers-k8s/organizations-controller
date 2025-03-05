@@ -18,7 +18,6 @@ import (
 
 	"github.com/aws-controllers-k8s/organizations-controller/pkg/tags"
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
-	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 )
 
 func (rm *resourceManager) customUpdateAccount(
@@ -27,9 +26,6 @@ func (rm *resourceManager) customUpdateAccount(
 	latest *resource,
 	delta *ackcompare.Delta,
 ) (updated *resource, err error) {
-	rlog := ackrtlog.FromContext(ctx)
-	exit := rlog.Trace("rm.customUpdateAccount")
-	defer func(err error) { exit(err) }(err)
 
 	// Default `updated` to `desired` because it is likely
 	// EC2 `modify` APIs do NOT return output, only errors.
@@ -52,4 +48,11 @@ func (rm *resourceManager) customUpdateAccount(
 	newDesired := rm.concreteResource(desired.DeepCopy())
 	newDesired.ko.Status = updated.ko.Status
 	return newDesired, nil
+}
+
+func (rm *resourceManager) fetchCurrentTags(
+	ctx context.Context,
+	resourceID *string,
+) (map[string]string, error) {
+	return tags.FetchTags(ctx, rm.sdkapi, rm.metrics, *resourceID)
 }

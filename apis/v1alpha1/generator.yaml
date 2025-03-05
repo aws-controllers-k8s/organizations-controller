@@ -14,6 +14,9 @@ operations:
     resource_name: Account
 resources:
   Account:
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/account/sdk_read_one_post_set_output.go.tpl
     fields:
       AccountID:
         is_primary_key: true

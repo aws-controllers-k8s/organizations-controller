@@ -53,6 +53,34 @@ type tagsClient interface {
 	UntagResource(context.Context, *svcsdk.UntagResourceInput, ...func(*svcsdk.Options)) (*svcsdk.UntagResourceOutput, error)
 }
 
+// FetchTags fetches the Tags for the supplied Resource
+func FetchTags(
+	ctx context.Context,
+	client tagsClient,
+	mr metricsRecorder,
+	ResourceId string,
+) (tags map[string]string, err error) {
+	tags = make(map[string]string)
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.fetchTags")
+	defer func() { exit(err) }()
+	output, err := client.ListTagsForResource(
+		ctx,
+		&svcsdk.ListTagsForResourceInput{
+			ResourceId: aws.String(ResourceId),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, tag := range output.Tags {
+		tags[*tag.Key] = *tag.Value
+	}
+
+	return tags, nil
+}
+
 // SyncTags examines the Tags in the supplied Resource and calls the
 // TagResource and UntagResource APIs to ensure that the set of
 // associated Tags stays in sync with the Resource.Spec.Tags
@@ -60,7 +88,7 @@ func SyncTags(
 	ctx context.Context,
 	client tagsClient,
 	mr metricsRecorder,
-	resourceARN string,
+	resourceId string,
 	desiredTags map[string]string,
 	existingTags map[string]string,
 ) (err error) {
@@ -92,7 +120,7 @@ func SyncTags(
 			ctx,
 			client,
 			mr,
-			resourceARN,
+			resourceId,
 			toAdd,
 		); err != nil {
 			return err
@@ -106,7 +134,7 @@ func SyncTags(
 			ctx,
 			client,
 			mr,
-			resourceARN,
+			resourceId,
 			toDelete,
 		); err != nil {
 			return err

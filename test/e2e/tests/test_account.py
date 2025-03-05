@@ -30,6 +30,9 @@ RESOURCE_PLURAL = "accounts"
 # Accounts take a bit to go into a SUCCEEDED state
 CREATE_WAIT_SECONDS = 120
 
+# Time to wait after modifying the CR for the status to change
+MODIFY_WAIT_AFTER_SECONDS = 10
+
 # Accounts can take a bit to become Suspended/Closed and as such be removed.
 DELETE_WAIT_AFTER_SECONDS = 60
 
@@ -127,3 +130,29 @@ class TestAccount:
             "key1": "value1",
         }
         account_validator.assert_tags(account_id, expect_tags)
+
+        # Update tags
+        update_tags = [
+                {
+                    "key": "updatedtagkey",
+                    "value": "updatedtagvalue",
+                }
+            ]
+
+        # Patch the account, updating the tags with new pair
+        updates = {
+            "spec": {"tags": update_tags},
+        }
+
+        k8s.patch_custom_resource(ref, updates)
+        time.sleep(MODIFY_WAIT_AFTER_SECONDS)
+
+        # Check resource synced successfully
+        assert k8s.wait_on_condition(ref, "ACK.ResourceSynced", "True", wait_periods=5)
+
+        # Check for updated user tags; system tags should persist
+        updated_tags = {
+            "updatedtagkey": "updatedtagvalue"
+        }
+
+        account_validator.assert_tags(account_id, updated_tags)
