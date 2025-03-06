@@ -72,6 +72,7 @@ rules:
 - apiGroups:
   - organizations.services.k8s.aws
   resources:
+  - accounts
   - organizationalunits
   verbs:
   - create
@@ -84,6 +85,7 @@ rules:
 - apiGroups:
   - organizations.services.k8s.aws
   resources:
+  - accounts/status
   - organizationalunits/status
   verbs:
   - get

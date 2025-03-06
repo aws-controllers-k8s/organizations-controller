@@ -1,11 +1,42 @@
 ignore:
   resource_names:
-      - Account
+      #- Account
       - GovCloudAccount
       - Organization
       #- OrganizationalUnit
       - Policy
+operations:
+  CloseAccount:
+    operation_type: Delete
+    resource_name: Account
+  DescribeCreateAccountStatus:
+    operation_type: ReadOne
+    resource_name: Account
 resources:
+  Account:
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/account/sdk_read_one_post_set_output.go.tpl
+    fields:
+      AccountID:
+        is_primary_key: true
+    renames:
+      operations:
+        CreateAccount:
+          input_fields:
+            AccountName: Name
+          output_fields:
+            Id: CreateAccountRequestId
+        DescribeAccount:
+          input_fields:
+            AccountName: Name
+    update_operation:
+      custom_method_name: customUpdateAccount
+    synced:
+      when:
+        - path: Status.State
+          in:
+            - SUCCEEDED
   OrganizationalUnit:
     renames:
       operations:

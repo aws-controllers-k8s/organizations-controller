@@ -1,0 +1,10 @@
+apiVersion: organizations.services.k8s.aws/v1alpha1
+kind: Account
+metadata:
+  name: $ACCOUNT_NAME
+spec:
+  name: $ACCOUNT_NAME
+  email: $ACCOUNT_EMAIL
+  tags:
+  - key: key1
+    value: value1
