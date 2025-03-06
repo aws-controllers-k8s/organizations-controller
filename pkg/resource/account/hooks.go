@@ -27,11 +27,6 @@ func (rm *resourceManager) customUpdateAccount(
 	delta *ackcompare.Delta,
 ) (updated *resource, err error) {
 
-	// Default `updated` to `desired` because it is likely
-	// EC2 `modify` APIs do NOT return output, only errors.
-	// If the `modify` calls (i.e. `sync`) do NOT return
-	// an error, then the update was successful and desired.Spec
-	// (now updated.Spec) reflects the latest resource state.
 	updated = rm.concreteResource(desired.DeepCopy())
 
 	if delta.DifferentAt("Spec.Tags") {
