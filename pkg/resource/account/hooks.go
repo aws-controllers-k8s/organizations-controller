@@ -29,12 +29,15 @@ func (rm *resourceManager) customUpdateAccount(
 
 	updated = rm.concreteResource(desired.DeepCopy())
 
+	desiredTags, _ := convertToOrderedACKTags(desired.ko.Spec.Tags)
+	latestTags, _ := convertToOrderedACKTags(latest.ko.Spec.Tags)
+
 	if delta.DifferentAt("Spec.Tags") {
 		if err := tags.SyncTags(
 			ctx, rm.sdkapi, rm.metrics,
 			*latest.ko.Status.AccountID,
-			ToACKTags(desired.ko.Spec.Tags),
-			ToACKTags(latest.ko.Spec.Tags),
+			desiredTags,
+			latestTags,
 		); err != nil {
 			return nil, err
 		}
