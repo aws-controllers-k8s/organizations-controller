@@ -57,6 +57,8 @@ spec:
 
                     - There must be one and only one @ symbol, which separates the local name
                       from the domain name.
+
+                  Regex Pattern: `^[^\s@]+@[^\s@]+\.[^\s@]+$`
                 type: string
               iamUserAccessToBilling:
                 description: |-
@@ -72,7 +74,10 @@ spec:
                   for the new account.
                 type: string
               name:
-                description: The friendly name of the member account.
+                description: |-
+                  The friendly name of the member account.
+
+                  Regex Pattern: `^[\u0020-\u007E]+$`
                 type: string
               roleName:
                 description: |-
@@ -98,6 +103,8 @@ spec:
                   The regex pattern (http://wikipedia.org/wiki/regex) that is used to validate
                   this parameter. The pattern can include uppercase letters, lowercase letters,
                   digits with no spaces, and any of the following characters: =,.@-
+
+                  Regex Pattern: `^[\w+=,.@-]{1,64}$`
                 type: string
               tags:
                 description: |-
@@ -144,6 +151,8 @@ spec:
 
                   The regex pattern (http://wikipedia.org/wiki/regex) for an account ID string
                   requires exactly 12 digits.
+
+                  Regex Pattern: `^\d{12}$`
                 type: string
               ackResourceMetadata:
                 description: |-
@@ -222,6 +231,8 @@ spec:
                   The regex pattern (http://wikipedia.org/wiki/regex) for a create account
                   request ID string requires "car-" followed by from 8 to 32 lowercase letters
                   or digits.
+
+                  Regex Pattern: `^car-[a-z0-9]{8,32}$`
                 type: string
               failureReason:
                 description: |-
@@ -280,6 +291,8 @@ spec:
                 description: |-
                   If the account was created successfully, the unique identifier (ID) of the
                   new account in the Amazon Web Services GovCloud (US) Region.
+
+                  Regex Pattern: `^\d{12}$`
                 type: string
               requestedTimestamp:
                 description: The date and time that the request was made for the account

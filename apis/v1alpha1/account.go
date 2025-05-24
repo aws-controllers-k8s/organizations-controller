@@ -39,6 +39,7 @@ type AccountSpec struct {
 	//   - There must be one and only one @ symbol, which separates the local name
 	//     from the domain name.
 	//
+	// Regex Pattern: `^[^\s@]+@[^\s@]+\.[^\s@]+$`
 	// +kubebuilder:validation:Required
 	Email *string `json:"email"`
 	// If set to ALLOW, the new account enables IAM users to access account billing
@@ -53,6 +54,8 @@ type AccountSpec struct {
 	// for the new account.
 	IAMUserAccessToBilling *string `json:"iamUserAccessToBilling,omitempty"`
 	// The friendly name of the member account.
+	//
+	// Regex Pattern: `^[\u0020-\u007E]+$`
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The name of an IAM role that Organizations automatically preconfigures in
@@ -77,6 +80,8 @@ type AccountSpec struct {
 	// The regex pattern (http://wikipedia.org/wiki/regex) that is used to validate
 	// this parameter. The pattern can include uppercase letters, lowercase letters,
 	// digits with no spaces, and any of the following characters: =,.@-
+	//
+	// Regex Pattern: `^[\w+=,.@-]{1,64}$`
 	RoleName *string `json:"roleName,omitempty"`
 	// A list of tags that you want to attach to the newly created account. For
 	// each tag in the list, you must specify both a tag key and a value. You can
@@ -108,6 +113,8 @@ type AccountStatus struct {
 	//
 	// The regex pattern (http://wikipedia.org/wiki/regex) for an account ID string
 	// requires exactly 12 digits.
+	//
+	// Regex Pattern: `^\d{12}$`
 	// +kubebuilder:validation:Optional
 	AccountID *string `json:"accountID,omitempty"`
 	// The date and time that the account was created and the request completed.
@@ -119,6 +126,8 @@ type AccountStatus struct {
 	// The regex pattern (http://wikipedia.org/wiki/regex) for a create account
 	// request ID string requires "car-" followed by from 8 to 32 lowercase letters
 	// or digits.
+	//
+	// Regex Pattern: `^car-[a-z0-9]{8,32}$`
 	// +kubebuilder:validation:Optional
 	CreateAccountRequestID *string `json:"createAccountRequestID,omitempty"`
 	// If the request failed, a description of the reason for the failure.
@@ -175,6 +184,8 @@ type AccountStatus struct {
 	FailureReason *string `json:"failureReason,omitempty"`
 	// If the account was created successfully, the unique identifier (ID) of the
 	// new account in the Amazon Web Services GovCloud (US) Region.
+	//
+	// Regex Pattern: `^\d{12}$`
 	// +kubebuilder:validation:Optional
 	GovCloudAccountID *string `json:"govCloudAccountID,omitempty"`
 	// The date and time that the request was made for the account creation.
