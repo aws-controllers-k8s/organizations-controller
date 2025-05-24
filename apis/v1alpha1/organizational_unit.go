@@ -29,6 +29,8 @@ import (
 type OrganizationalUnitSpec struct {
 
 	// The friendly name to assign to the new OU.
+	//
+	// Regex Pattern: `^[\s\S]*$`
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 	// The unique identifier (ID) of the parent root or OU that you want to create
@@ -45,6 +47,7 @@ type OrganizationalUnitSpec struct {
 	//     OU is in). This string is followed by a second "-" dash and from 8 to
 	//     32 additional lowercase letters or digits.
 	//
+	// Regex Pattern: `^(r-[0-9a-z]{4,32})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$`
 	// +kubebuilder:validation:Required
 	ParentID *string `json:"parentID"`
 	// A list of tags that you want to attach to the newly created OU. For each
@@ -78,6 +81,8 @@ type OrganizationalUnitStatus struct {
 	// unit ID string requires "ou-" followed by from 4 to 32 lowercase letters
 	// or digits (the ID of the root that contains the OU). This string is followed
 	// by a second "-" dash and from 8 to 32 additional lowercase letters or digits.
+	//
+	// Regex Pattern: `^ou-[0-9a-z]{4,32}-[a-z0-9]{8,32}$`
 	// +kubebuilder:validation:Optional
 	ID *string `json:"id,omitempty"`
 }
