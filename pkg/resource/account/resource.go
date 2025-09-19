@@ -103,16 +103,16 @@ func (r *resource) SetIdentifiers(identifier *ackv1alpha1.AWSIdentifiers) error 
 
 // PopulateResourceFromAnnotation populates the fields passed from adoption annotation
 func (r *resource) PopulateResourceFromAnnotation(fields map[string]string) error {
-	tmp, ok := fields["accountID"]
+	primaryKey, ok := fields["accountID"]
 	if !ok {
 		return ackerrors.NewTerminalError(fmt.Errorf("required field missing: accountID"))
 	}
-	r.ko.Status.AccountID = &tmp
-
-	f0, f0ok := fields["createAccountRequestID"]
-	if f0ok {
-		r.ko.Status.CreateAccountRequestID = aws.String(f0)
+	r.ko.Status.AccountID = &primaryKey
+	f0, ok := fields["createAccountRequestID"]
+	if !ok {
+		return ackerrors.NewTerminalError(fmt.Errorf("required field missing: createAccountRequestID"))
 	}
+	r.ko.Status.CreateAccountRequestID = &f0
 
 	return nil
 }
