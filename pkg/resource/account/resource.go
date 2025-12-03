@@ -21,7 +21,6 @@ import (
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackerrors "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rtclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -93,11 +92,6 @@ func (r *resource) SetIdentifiers(identifier *ackv1alpha1.AWSIdentifiers) error 
 	}
 	r.ko.Status.AccountID = &identifier.NameOrID
 
-	f0, f0ok := identifier.AdditionalKeys["createAccountRequestID"]
-	if f0ok {
-		r.ko.Status.CreateAccountRequestID = aws.String(f0)
-	}
-
 	return nil
 }
 
@@ -108,11 +102,6 @@ func (r *resource) PopulateResourceFromAnnotation(fields map[string]string) erro
 		return ackerrors.NewTerminalError(fmt.Errorf("required field missing: accountID"))
 	}
 	r.ko.Status.AccountID = &primaryKey
-	f0, ok := fields["createAccountRequestID"]
-	if !ok {
-		return ackerrors.NewTerminalError(fmt.Errorf("required field missing: createAccountRequestID"))
-	}
-	r.ko.Status.CreateAccountRequestID = &f0
 
 	return nil
 }

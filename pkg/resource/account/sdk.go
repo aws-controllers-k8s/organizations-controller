@@ -63,6 +63,15 @@ func (rm *resourceManager) sdkFind(
 	defer func() {
 		exit(err)
 	}()
+	// AccountID is not populated until the account creation succeeds.
+	// continue describing createStatus until account finishes creating
+	if r.ko.Status.AccountID == nil && r.ko.Status.CreateAccountRequestID != nil {
+		r = rm.concreteResource(r.DeepCopy())
+		r.ko.Status.AccountID, err = rm.getAccountID(ctx, r)
+		if err != nil {
+			return nil, err
+		}
+	}
 	// If any required fields in the input shape are missing, AWS resource is
 	// not created yet. Return NotFound here to indicate to callers that the
 	// resource isn't yet created.
@@ -75,12 +84,12 @@ func (rm *resourceManager) sdkFind(
 		return nil, err
 	}
 
-	var resp *svcsdk.DescribeCreateAccountStatusOutput
-	resp, err = rm.sdkapi.DescribeCreateAccountStatus(ctx, input)
-	rm.metrics.RecordAPICall("READ_ONE", "DescribeCreateAccountStatus", err)
+	var resp *svcsdk.DescribeAccountOutput
+	resp, err = rm.sdkapi.DescribeAccount(ctx, input)
+	rm.metrics.RecordAPICall("READ_ONE", "DescribeAccount", err)
 	if err != nil {
 		var awsErr smithy.APIError
-		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "AWSOrganizationsNotInUseException" {
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "AccountNotFoundException" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -90,33 +99,25 @@ func (rm *resourceManager) sdkFind(
 	// the original Kubernetes object we passed to the function
 	ko := r.ko.DeepCopy()
 
-	if resp.CreateAccountStatus.AccountId != nil {
-		ko.Status.AccountID = resp.CreateAccountStatus.AccountId
-	} else {
-		ko.Status.AccountID = nil
+	if ko.Status.ACKResourceMetadata == nil {
+		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
 	}
-	if resp.CreateAccountStatus.CompletedTimestamp != nil {
-		ko.Status.CompletedTimestamp = &metav1.Time{*resp.CreateAccountStatus.CompletedTimestamp}
-	} else {
-		ko.Status.CompletedTimestamp = nil
+	if resp.Account.Arn != nil {
+		arn := ackv1alpha1.AWSResourceName(*resp.Account.Arn)
+		ko.Status.ACKResourceMetadata.ARN = &arn
 	}
-	if resp.CreateAccountStatus.FailureReason != "" {
-		ko.Status.FailureReason = aws.String(string(resp.CreateAccountStatus.FailureReason))
+	if resp.Account.Email != nil {
+		ko.Spec.Email = resp.Account.Email
 	} else {
-		ko.Status.FailureReason = nil
+		ko.Spec.Email = nil
 	}
-	if resp.CreateAccountStatus.GovCloudAccountId != nil {
-		ko.Status.GovCloudAccountID = resp.CreateAccountStatus.GovCloudAccountId
+	if resp.Account.Name != nil {
+		ko.Spec.Name = resp.Account.Name
 	} else {
-		ko.Status.GovCloudAccountID = nil
+		ko.Spec.Name = nil
 	}
-	if resp.CreateAccountStatus.RequestedTimestamp != nil {
-		ko.Status.RequestedTimestamp = &metav1.Time{*resp.CreateAccountStatus.RequestedTimestamp}
-	} else {
-		ko.Status.RequestedTimestamp = nil
-	}
-	if resp.CreateAccountStatus.State != "" {
-		ko.Status.State = aws.String(string(resp.CreateAccountStatus.State))
+	if resp.Account.Status != "" {
+		ko.Status.State = aws.String(string(resp.Account.Status))
 	} else {
 		ko.Status.State = nil
 	}
@@ -138,7 +139,7 @@ func (rm *resourceManager) sdkFind(
 func (rm *resourceManager) requiredFieldsMissingFromReadOneInput(
 	r *resource,
 ) bool {
-	return r.ko.Status.CreateAccountRequestID == nil
+	return r.ko.Status.AccountID == nil
 
 }
 
@@ -146,11 +147,11 @@ func (rm *resourceManager) requiredFieldsMissingFromReadOneInput(
 // payload of the Describe API call for the resource
 func (rm *resourceManager) newDescribeRequestPayload(
 	r *resource,
-) (*svcsdk.DescribeCreateAccountStatusInput, error) {
-	res := &svcsdk.DescribeCreateAccountStatusInput{}
+) (*svcsdk.DescribeAccountInput, error) {
+	res := &svcsdk.DescribeAccountInput{}
 
-	if r.ko.Status.CreateAccountRequestID != nil {
-		res.CreateAccountRequestId = r.ko.Status.CreateAccountRequestID
+	if r.ko.Status.AccountID != nil {
+		res.AccountId = r.ko.Status.AccountID
 	}
 
 	return res, nil

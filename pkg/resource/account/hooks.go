@@ -15,9 +15,16 @@ package account
 
 import (
 	"context"
+	"fmt"
+
+	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
+	"github.com/aws-controllers-k8s/runtime/pkg/errors"
+	"github.com/aws-controllers-k8s/runtime/pkg/requeue"
+	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/organizations"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/organizations/types"
 
 	"github.com/aws-controllers-k8s/organizations-controller/pkg/tags"
-	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 )
 
 func (rm *resourceManager) customUpdateAccount(
@@ -53,4 +60,40 @@ func (rm *resourceManager) fetchCurrentTags(
 	resourceID *string,
 ) (map[string]string, error) {
 	return tags.FetchTags(ctx, rm.sdkapi, rm.metrics, *resourceID)
+}
+
+// getAccountID fetches the accountID after Account creation succeeds
+// returns requeue error while account creation is in progress
+func (rm *resourceManager) getAccountID(ctx context.Context, desired *resource) (accountID *string, err error) {
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.getAccountID")
+	defer func() {
+		exit(err)
+	}()
+	input := &svcsdk.DescribeCreateAccountStatusInput{
+		CreateAccountRequestId: desired.ko.Status.CreateAccountRequestID,
+	}
+	resp, err := rm.sdkapi.DescribeCreateAccountStatus(ctx, input)
+	rm.metrics.RecordAPICall("READ_ONE", "DescribeCreateAccountStatus", err)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.CreateAccountStatus.State {
+	case svcsdktypes.CreateAccountStateSucceeded:
+		return resp.CreateAccountStatus.AccountId, nil
+
+	case svcsdktypes.CreateAccountStateFailed:
+		return nil, errors.NewTerminalError(fmt.Errorf("account creation failed"))
+
+	case svcsdktypes.CreateAccountStateInProgress:
+		return nil, requeue.NeededAfter(
+			fmt.Errorf("account creation in progress"),
+			requeue.DefaultRequeueAfterDuration,
+		)
+
+	default:
+		return nil, fmt.Errorf("unknown account creation state %s", resp.CreateAccountStatus.State)
+	}
+
 }
