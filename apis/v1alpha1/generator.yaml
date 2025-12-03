@@ -9,14 +9,13 @@ operations:
   CloseAccount:
     operation_type: Delete
     resource_name: Account
-  DescribeCreateAccountStatus:
-    operation_type: ReadOne
-    resource_name: Account
 resources:
   Account:
     hooks:
       sdk_read_one_post_set_output:
         template_path: hooks/account/sdk_read_one_post_set_output.go.tpl
+      sdk_read_one_pre_build_request:
+        template_path: hooks/account/sdk_read_one_pre_build_request.go.tpl
     fields:
       AccountID:
         is_primary_key: true
@@ -28,15 +27,17 @@ resources:
           output_fields:
             Id: CreateAccountRequestId
         DescribeAccount:
-          input_fields:
-            AccountName: Name
+          output_fields:
+            Id: AccountID
+            Status: State
     update_operation:
       custom_method_name: customUpdateAccount
     synced:
       when:
         - path: Status.State
           in:
-            - SUCCEEDED
+            - ACTIVE
+            - SUSPENDED
   OrganizationalUnit:
     renames:
       operations:
