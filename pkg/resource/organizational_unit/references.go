@@ -17,9 +17,15 @@ package organizational_unit
 
 import (
 	"context"
+	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
+	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	ackrt "github.com/aws-controllers-k8s/runtime/pkg/runtime"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/organizations-controller/apis/v1alpha1"
@@ -31,6 +37,10 @@ import (
 // values.
 func (rm *resourceManager) ClearResolvedReferences(res acktypes.AWSResource) acktypes.AWSResource {
 	ko := rm.concreteResource(res).ko.DeepCopy()
+
+	if ko.Spec.ParentRef != nil {
+		ko.Spec.ParentID = nil
+	}
 
 	return &resource{ko}
 }
@@ -47,11 +57,119 @@ func (rm *resourceManager) ResolveReferences(
 	apiReader client.Reader,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, bool, error) {
-	return res, false, nil
+	ko := rm.concreteResource(res).ko
+
+	resourceHasReferences := false
+	err := validateReferenceFields(ko)
+	if fieldHasReferences, err := rm.resolveReferenceForParentID(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
+	return &resource{ko}, resourceHasReferences, err
 }
 
 // validateReferenceFields validates the reference field and corresponding
 // identifier field.
 func validateReferenceFields(ko *svcapitypes.OrganizationalUnit) error {
+
+	if ko.Spec.ParentRef != nil && ko.Spec.ParentID != nil {
+		return ackerr.ResourceReferenceAndIDNotSupportedFor("ParentID", "ParentRef")
+	}
+	if ko.Spec.ParentRef == nil && ko.Spec.ParentID == nil {
+		return ackerr.ResourceReferenceOrIDRequiredFor("ParentID", "ParentRef")
+	}
+	return nil
+}
+
+// resolveReferenceForParentID reads the resource referenced
+// from ParentRef field and sets the ParentID
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForParentID(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.OrganizationalUnit,
+) (hasReferences bool, err error) {
+	if ko.Spec.ParentRef != nil && ko.Spec.ParentRef.From != nil {
+		hasReferences = true
+		arr := ko.Spec.ParentRef.From
+		if arr.Name == nil || *arr.Name == "" {
+			return hasReferences, fmt.Errorf("provided resource reference is nil or empty: ParentRef")
+		}
+		namespace, err := ackrt.ResolveCrossNamespaceReference(
+			ctx,
+			rm.cfg.EnableCrossNamespace,
+			&ko.Status.Conditions,
+			ackrt.CrossNamespaceRefKindResource,
+			ko.ObjectMeta.GetNamespace(),
+			arr.Namespace,
+			*arr.Name,
+		)
+		if err != nil {
+			return hasReferences, err
+		}
+		obj := &svcapitypes.OrganizationalUnit{}
+		if err := getReferencedResourceState_OrganizationalUnit(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+			return hasReferences, err
+		}
+		ko.Spec.ParentID = (*string)(obj.Status.ID)
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_OrganizationalUnit looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_OrganizationalUnit(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *svcapitypes.OrganizationalUnit,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"OrganizationalUnit",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"OrganizationalUnit",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"OrganizationalUnit",
+			namespace, name)
+	}
+	if obj.Status.ID == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"OrganizationalUnit",
+			namespace, name,
+			"Status.ID")
+	}
 	return nil
 }

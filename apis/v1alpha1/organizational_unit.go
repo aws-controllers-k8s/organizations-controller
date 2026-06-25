@@ -48,8 +48,8 @@ type OrganizationalUnitSpec struct {
 	//     32 additional lowercase letters or digits.
 	//
 	// Regex Pattern: `^(r-[0-9a-z]{4,32})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$`
-	// +kubebuilder:validation:Required
-	ParentID *string `json:"parentID"`
+	ParentID  *string                                  `json:"parentID,omitempty"`
+	ParentRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"parentRef,omitempty"`
 	// A list of tags that you want to attach to the newly created OU. For each
 	// tag in the list, you must specify both a tag key and a value. You can set
 	// the value to an empty string, but you can't set it to null. For more information
