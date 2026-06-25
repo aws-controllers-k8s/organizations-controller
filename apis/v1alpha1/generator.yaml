@@ -51,3 +51,7 @@ resources:
       ID:
         is_read_only: true
         is_primary_key: true
+      ParentID:
+        references:
+          resource: OrganizationalUnit
+          path: Status.ID

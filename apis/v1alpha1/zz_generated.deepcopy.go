@@ -530,6 +530,11 @@ func (in *OrganizationalUnitSpec) DeepCopyInto(out *OrganizationalUnitSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ParentRef != nil {
+		in, out := &in.ParentRef, &out.ParentRef
+		*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Tags != nil {
 		in, out := &in.Tags, &out.Tags
 		*out = make([]*Tag, len(*in))
