@@ -32,12 +32,12 @@ type AccountSpec struct {
 	//
 	// The rules for a valid email address:
 	//
-	//   - The address must be a minimum of 6 and a maximum of 64 characters long.
+	//    * The address must be a minimum of 6 and a maximum of 64 characters long.
 	//
-	//   - All characters must be 7-bit ASCII characters.
+	//    * All characters must be 7-bit ASCII characters.
 	//
-	//   - There must be one and only one @ symbol, which separates the local name
-	//     from the domain name.
+	//    * There must be one and only one @ symbol, which separates the local name
+	//    from the domain name.
 	//
 	// Regex Pattern: `^[^\s@]+@[^\s@]+\.[^\s@]+$`
 	// +kubebuilder:validation:Required
@@ -69,13 +69,13 @@ type AccountSpec struct {
 	// For more information about how to use this role to access the member account,
 	// see the following links:
 	//
-	//   - Creating the OrganizationAccountAccessRole in an invited member account
-	//     (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_create-cross-account-role)
-	//     in the Organizations User Guide
+	//    * Creating the OrganizationAccountAccessRole in an invited member account
+	//    (https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_create-cross-account-role)
+	//    in the Organizations User Guide
 	//
-	//   - Steps 2 and 3 in IAM Tutorial: Delegate access across Amazon Web Services
-	//     accounts using IAM roles (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html)
-	//     in the IAM User Guide
+	//    * Steps 2 and 3 in IAM Tutorial: Delegate access across Amazon Web Services
+	//    accounts using IAM roles (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html)
+	//    in the IAM User Guide
 	//
 	// The regex pattern (http://wikipedia.org/wiki/regex) that is used to validate
 	// this parameter. The pattern can include uppercase letters, lowercase letters,
